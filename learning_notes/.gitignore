@@ -1,0 +1,19 @@
+# 仅保护个人学习区；保留上游根 .gitignore 原样。
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+raw_logs/
+outputs/
+*.log
+*.pem
+*.key
+.DS_Store
+Thumbs.db
