@@ -5,6 +5,7 @@
 | 编号 | 小节 / 文件 | 问题摘要 | 类型 | 状态 | 证据 |
 | --- | --- | --- | --- | --- | --- |
 | CH04-Q001 | 4.1.3 · HelloAgentsLLM | 从这段客户端代码学习 Python，并记录笔记 | 语法 / 代码阅读 / 架构 | 已解释待验证 | 用户前期代码与讨论；当前原文位置已核对 |
+| CH04-Q002 | 4.2 · ReAct.py / tools.py / llm_client.py | 从头讲清 ReAct 代码项目，并衔接 SDK、Client 和类封装 | 源码 / 控制流 / 工具调用 | 已解释待学习者验证 | 原码核对、10 项离线控制流测试、两轮演示；未联调真实服务 |
 
 ## CH04-Q001 · 从 HelloAgentsLLM 开始学习
 
@@ -33,4 +34,24 @@
 
 **待确认：** 环境、独立作答和运行输出。收到并检查学习者代码后才更新问题状态，不因已经生成笔记就标记已掌握。
 
-后续新问题使用 CH04-Q002 起；保留已有编号与更正历史。
+## CH04-Q002 · 4.2 ReAct 代码项目完整讲解
+
+提问与归档日期：2026-09-14。
+
+**问题原意：** “给我讲清楚 4.2 React 这一节代码项目”。定位为 Hello-Agents 第 4.2 节 ReAct，而非前端 React；用户刚学习 SDK、Client、Pipeline 和类封装。
+
+**读取基线：** main 为 `cd40b48b2acbcf41f1f2e40b006a859444d478cd`。关键源码 blob：ReAct.py 为 `04ae533df7d71f14a685eb0349e024291fda7c90`，tools.py 为 `a4665c2a6c8d352f9fe6e7647a638bcfa98e262d`，llm_client.py 为 `0793e234b8456e986fe23e426136033c1d44519a`。
+
+**回答位置：** [完整源码链路讲解](practice/001_react_trace/README.md)，以及 [离线两轮演示](practice/001_react_trace/react42_offline_demo.py)。知识摘要已并入 [notes.md](notes.md)。
+
+**重点：** 从程序末尾入口开始，解释对象组合、self、工具字典和函数对象、提示词占位符、逐轮模型调用、正则解析、实际函数执行、搜索服务、Action/Observation 历史、Finish 和 max_steps。区分模型生成动作文本与 Python 执行动作，也区分 SDK 内部流式读取与 think 对 Agent 返回完整字符串。
+
+**实际验证：** 本轮在助手容器核对复制的原 ReAct.py Git blob SHA，与仓库一致；抽取原 Agent 类及提示词并注入离线替身，实际运行 10 项控制流测试，全部通过，包括成功复现原版错误日志和 Finish 前缀判断缺陷。另运行同目录演示，确认 2 次模拟模型调用、1 次搜索替身调用及 Observation 回灌。验证的是控制循环，不是模型质量或真实服务兼容性。
+
+**未验证：** 未安装并联调真实 OpenAI/SerpApi SDK，未使用真实模型或搜索 API，未验证用户本地环境，也没有把虚构示例当成实际手机信息。
+
+**修改范围：** 仅在 learning_notes/chapter04 内增加学习资料、实践脚本和问题记录，保留原 docs 与 code；离线脚本显式替换网络组件，不伪称教材原版联网运行成功。
+
+**学习者练习：** 注册 Length 工具，解释 `Length[hello]` 如何变成 `text_length('hello')`，并说明为什么应传函数对象而非 `text_length()`。学习者独立完成后再更新掌握状态。
+
+后续新问题使用 CH04-Q003 起；保留已有编号与更正历史。
