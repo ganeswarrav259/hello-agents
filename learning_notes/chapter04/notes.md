@@ -78,6 +78,36 @@ messages = [
 待確認：学习者系统、Python 版本、独立作答、真实依赖和服务配置。
 本轮只做来源定位和笔记归档；没有运行此客户端，也不把上次助手环境的测试记作本轮通过。
 
-## 4.2—后续小节
+## 4.2 · ReAct 从入口到工具执行
 
-尚未开始逐节学习。ReAct、Plan-and-Solve、Reflection 的知识和代码问题将按真实提问继续记录。
+补充日期：2026-09-14。对应真实问题：CH04-Q002。状态：已讲解，待学习者独立验证。
+
+完整讲解、源码版本、运行方式、边界分析与练习见 [4.2 ReAct 完整链路](practice/001_react_trace/README.md)。同目录提供 [无需密钥的离线演示](practice/001_react_trace/react42_offline_demo.py)。原教材 `docs/` 和 `code/` 未修改。
+
+最重要的链路：
+
+```text
+ReActAgent.run
+  → 拼接问题、工具描述和历史
+  → HelloAgentsLLM.think
+  → OpenAI Client 请求模型服务
+  → 解析模型返回的 Action 文本
+  → ToolExecutor 按名称查找函数
+  → Python 执行 search(query)
+  → 把 Action 和 Observation 追加到历史
+  → 下一轮模型调用，或 Finish 返回答案
+```
+
+SDK 是工具包；Client 是客户端实例；HelloAgentsLLM 是项目封装；ReActAgent 是控制器。Agent 持有 LLM 包装和工具注册器，而不是继承它们。`agent.llm_client.client` 才是内层 OpenAI Client。
+
+`registerTool('Search', description, search)` 保存函数对象，不执行搜索；`tool_function(tool_input)` 才执行。给模型的是工具名称和说明文本，不是函数实现。本章也未使用原生 API 的 `tools=`。
+
+教材的 think 虽然流式打印，但返回前会把所有文本片段拼接完。因此 ReActAgent 拿到完整字符串后才解析工具动作。Thought 是提示生成的可见字段，不是 SDK 读取的内部推理；原脚本只把 Action 和 Observation 保存到 history。
+
+history 在每次 run 开始时清空；下一轮通过重新构造 prompt 传递历史，不是 Client 自动记忆。max_steps 限制循环轮数，Finish 总结轮也计入。
+
+本轮验证：核对原 ReAct.py 的 Git blob SHA，使用其原提示词和原 Agent 类注入离线替身，10 项控制流测试通过；独立演示也验证了两轮模型替身调用、一次搜索函数调用。测试包括复现 Finish 前缀误判和错误终止日志，因此通过不等于原版缺陷已修复。未安装并联调真实 SDK，未请求模型/搜索服务，没有验证学习者本地环境。
+
+## 4.3—后续小节
+
+Plan-and-Solve、Reflection 尚未开始本轮逐节学习；后续按真实提问继续记录。
